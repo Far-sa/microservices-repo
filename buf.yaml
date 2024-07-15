@@ -3,7 +3,7 @@ deps:
   - buf.build/googleapis/googleapis
   - buf.build/grpc-ecosystem/grpc-gateway
 build:
-  include:
+  paths:
     - common/proto
 
 # version: v1

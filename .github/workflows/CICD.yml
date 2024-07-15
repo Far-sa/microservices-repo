@@ -57,7 +57,6 @@ jobs:
           git commit -m "Update generated protobuf files"
           git push origin main
 
-
 # name: CI/CD Pipeline
 
 # on:
