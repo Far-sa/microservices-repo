@@ -19,7 +19,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.22
+          go-version: 1.22.5
 
       - name: Install Buf
         run: |
@@ -28,19 +28,19 @@ jobs:
       - name: Generate Protobuf files for auth service
         run: |
           cd auth
-          buf mod update
+          buf mod update || buf dep update
           buf generate --template ../buf.gen.yaml
 
       - name: Generate Protobuf files for authz service
         run: |
           cd authz
-          buf mod update
+          buf mod update || buf dep update
           buf generate --template ../buf.gen.yaml
 
       - name: Generate Protobuf files for user service
         run: |
           cd user
-          buf mod update
+          buf mod update || buf dep update
           buf generate --template ../buf.gen.yaml
 
       - name: Check for changes
@@ -49,13 +49,13 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git diff-index --quiet HEAD || git commit -m "Update generated protobuf files"
+          git diff-index --quiet HEAD || echo "changes"
 
       - name: Push changes
-        if: steps.git_diff.outputs.changes == 'true'
+        if: steps.git_diff.outputs.changes == 'changes'
         run: |
+          git commit -m "Update generated protobuf files"
           git push origin main
-
 
 
 # name: CI/CD Pipeline
