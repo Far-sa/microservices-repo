@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package authz;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/Far-sa/common/authz";
+
+service AuthzService {
+  rpc CheckPermission (CheckPermissionRequest) returns (CheckPermissionResponse) {
+    option (google.api.http) = {
+      post: "/v1/check_permission"
+      body: "*"
+    };
+  }
+}
+
+message CheckPermissionRequest {
+  string token = 1;
+  string action = 2;
+}
+
+message CheckPermissionResponse {
+  bool allowed = 1;
+}

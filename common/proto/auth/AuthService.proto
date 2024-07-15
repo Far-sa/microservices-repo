@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package auth;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/Far-sa/common/auth";
+
+
+service AuthService {
+  rpc Login (LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/v1/login"
+      body: "*"
+    };
+  }
+  rpc GetPublicKey (google.protobuf.Empty) returns (PublicKeyResponse) {
+    option (google.api.http) = {
+      get: "/v1/public_key"
+    };
+  }
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+}
+
+message PublicKeyResponse {
+  string public_key = 1;
+}

@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package user;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/Far-sa/common/user";
+
+service UserService {
+  rpc RegisterUser (RegisterUserRequest) returns (RegisterUserResponse) {
+    option (google.api.http) = {
+      post: "/v1/register"
+      body: "*"
+    };
+  }
+  rpc GetUserProfile (GetUserProfileRequest) returns (UserProfileResponse) {
+    option (google.api.http) = {
+      get: "/v1/profile"
+    };
+  }
+}
+
+message RegisterUserRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message RegisterUserResponse {
+  bool success = 1;
+}
+
+message GetUserProfileRequest {
+  string token = 1;
+}
+
+message UserProfileResponse {
+  string username = 1;
+  string email = 2;
+}

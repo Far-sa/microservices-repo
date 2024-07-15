@@ -1,0 +1,18 @@
+# traefik.yml
+entryPoints:
+  web:
+    address: ":8090"
+
+providers:
+  file:
+    filename: /etc/traefik/dynamic.yml
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+
+api:
+  dashboard: true
+  insecure: true
+  
+log:
+  level: DEBUG

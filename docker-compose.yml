@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  traefik:
+    image: traefik:v2.4
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:8090"
+      - "--api.dashboard=true" # Enable dashboard
+    ports:
+      - "8090:8090" # Ensure this matches the entrypoint port
+      - "8081:8081" # For Traefik dashboard
+
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml
+      - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml
+    labels:
+      - "traefik.enable=true"

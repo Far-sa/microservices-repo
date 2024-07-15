@@ -1,0 +1,14 @@
+# version: v1
+# deps:
+#   - buf.build/googleapis/googleapis
+#   - buf.build/grpc-ecosystem/grpc-gateway
+
+version: v1
+name: micro-repo
+deps:
+  - buf.build/googleapis/googleapis
+  - buf.build/grpc-ecosystem/grpc-gateway
+build:
+  roots:
+    - common/proto
+    - google/api

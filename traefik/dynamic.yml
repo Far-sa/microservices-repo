@@ -1,0 +1,14 @@
+http:
+  routers:
+    gateway:
+      rule: "PathPrefix(`localhost`)" 
+      service: gateway
+      entryPoints:
+        - web
+
+  services:
+    gateway:
+      loadBalancer:
+        servers:
+          #- url: "http://gateway:5000"
+          - url: "http://host.docker.internal:4000"

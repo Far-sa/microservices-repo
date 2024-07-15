@@ -1,0 +1,222 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  generate:
+    name: Generate Protobufs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.19.13
+
+      - name: Install Buf
+        run: |
+          go install github.com/bufbuild/buf/cmd/buf@latest
+
+      - name: Generate Protobuf files for auth service
+        run: |
+          cd auth
+          buf mod update
+          buf generate --template ../buf.gen.yaml
+
+      - name: Generate Protobuf files for authz service
+        run: |
+          cd authz
+          buf mod update
+          buf generate --template ../buf.gen.yaml
+
+      - name: Generate Protobuf files for user service
+        run: |
+          cd user
+          buf mod update
+          buf generate --template ../buf.gen.yaml
+
+      - name: Check for changes
+        id: git_diff
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git diff-index --quiet HEAD || git commit -m "Update generated protobuf files"
+
+      - name: Push changes
+        if: steps.git_diff.outputs.changes == 'true'
+        run: |
+          git push origin main
+
+
+
+# name: CI/CD Pipeline
+
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - 'auth/**'
+#       - 'authz/**'
+#       - 'user/**'
+#       - 'buf.gen.yaml'
+#       - 'common/proto/**'
+#       #- 'google/api/**'
+#   pull_request:
+#     branches:
+#       - main
+#     paths:
+#       - 'auth/**'
+#       - 'authz/**'
+#       - 'user/**'
+#       - 'buf.gen.yaml'
+#       - 'common/proto/**'
+#       #- 'google/api/**'
+
+# jobs:
+#   auth-build:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v2
+
+#     - name: Set up Go
+#       uses: actions/setup-go@v2
+#       with:
+#         go-version: '1.19'
+
+#     - name: Install dependencies
+#       run: |
+#         cd auth
+#         go mod download
+
+#     - name: Install buf
+#       run: |
+#         wget https://github.com/bufbuild/buf/releases/download/v1.9.0/buf-Linux-x86_64
+#         chmod +x buf-Linux-x86_64
+#         sudo mv buf-Linux-x86_64 /usr/local/bin/buf
+
+#     - name: Install protoc-gen-openapiv2
+#       run: |
+#         go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
+
+#     - name: Generate gRPC code
+#       run: |
+#         buf mod update
+#         buf generate --template buf.gen.yaml
+
+#     - name: Run tests
+#       run: |
+#         cd auth
+#         go test ./... -v
+
+#     - name: Build binary
+#       run: |
+#         cd auth
+#         go build -o auth-service main.go
+
+#     - name: Run service
+#       run: |
+#         cd auth
+#         ./auth-service &
+
+#   authz-build:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v2
+
+#     - name: Set up Go
+#       uses: actions/setup-go@v2
+#       with:
+#         go-version: '1.19'
+
+#     - name: Install dependencies
+#       run: |
+#         cd authz
+#         go mod download
+
+#     - name: Install buf
+#       run: |
+#         wget https://github.com/bufbuild/buf/releases/download/v1.9.0/buf-Linux-x86_64
+#         chmod +x buf-Linux-x86_64
+#         sudo mv buf-Linux-x86_64 /usr/local/bin/buf
+
+#     - name: Install protoc-gen-openapiv2
+#       run: |
+#         go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
+
+#     - name: Generate gRPC code
+#       run: |
+#         buf mod update
+#         buf generate --template buf.gen.yaml
+
+#     - name: Run tests
+#       run: |
+#         cd authz
+#         go test ./... -v
+
+#     - name: Build binary
+#       run: |
+#         cd authz
+#         go build -o authz-service main.go
+
+#     - name: Run service
+#       run: |
+#         cd authz
+#         ./authz-service &
+
+#   user-build:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v2
+
+#     - name: Set up Go
+#       uses: actions/setup-go@v2
+#       with:
+#         go-version: '1.19'
+
+#     - name: Install dependencies
+#       run: |
+#         cd user
+#         go mod download
+
+#     - name: Install buf
+#       run: |
+#         wget https://github.com/bufbuild/buf/releases/download/v1.9.0/buf-Linux-x86_64
+#         chmod +x buf-Linux-x86_64
+#         sudo mv buf-Linux-x86_64 /usr/local/bin/buf
+
+#     - name: Install protoc-gen-openapiv2
+#       run: |
+#         go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
+
+#     - name: Generate gRPC code
+#       run: |
+#         buf mod update
+#         buf generate --template buf.gen.yaml
+
+#     - name: Run tests
+#       run: |
+#         cd user
+#         go test ./... -v
+
+#     - name: Build binary
+#       run: |
+#         cd user
+#         go build -o user-service main.go
+
+#     - name: Run service
+#       run: |
+#         cd user
+#         ./user-service &
